@@ -1,0 +1,10 @@
+tags:
+  - system
+responses:
+  200:
+    description: OK
+    schema:
+      type: object
+      properties:
+        ok:
+          type: boolean

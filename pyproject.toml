@@ -1,0 +1,26 @@
+[project]
+name = "tractus"
+version = "0.1.0"
+description = "Minimal Flask backend that calls OpenAI-compatible models"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "flask>=3.0",
+    "flasgger>=0.9.7",
+    "openai>=1.0",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = ["poethepoet>=0.30"]
+
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tractus"]
+
+[tool.poe.tasks]
+serve = { cmd = "python -m tractus.cli serve $args", help = "Start Flask dev server (example: poe serve 8000 --debug)" }
+chat = { cmd = "python -m tractus.cli chat $args", help = "One-shot chat call (example: poe chat 你好)" }

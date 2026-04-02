@@ -1,0 +1,32 @@
+tags:
+  - chat
+consumes:
+  - application/json
+parameters:
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+        model:
+          type: string
+responses:
+  200:
+    description: Model response
+    schema:
+      type: object
+      properties:
+        text:
+          type: string
+  400:
+    description: Invalid input
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
