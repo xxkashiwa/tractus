@@ -5,7 +5,7 @@ import sys
 
 
 def _cmd_serve(args: argparse.Namespace) -> int:
-    from .app import create_app
+    from ..flask import create_app
 
     app = create_app()
     port = args.port if args.port is not None else 8000
@@ -14,8 +14,8 @@ def _cmd_serve(args: argparse.Namespace) -> int:
 
 
 def _cmd_chat(args: argparse.Namespace) -> int:
-    from .config import get_settings
-    from .llm import chat_text, create_openai_client
+    from ..config import get_settings
+    from ..model import chat_text, create_openai_client
 
     message = " ".join(args.message).strip()
     if not message:
@@ -35,7 +35,7 @@ def _cmd_chat(args: argparse.Namespace) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="python -m tractus.cli",
+        prog="python -m tractus.tools.cli",
         description="CLI utilities for Tractus.",
     )
     sub = parser.add_subparsers(dest="command", required=True)
@@ -59,10 +59,6 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     if argv is None:
         argv = sys.argv[1:]
-
-    # Some task runners (e.g. poethepoet) may forward a standalone "--".
-    # Strip it so argparse can still parse the actual options.
-    argv = [item for item in argv if item != "--"]
 
     parser = build_parser()
     args = parser.parse_args(argv)

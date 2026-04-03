@@ -4,7 +4,7 @@ from typing import Any
 
 from openai import OpenAI
 
-from .config import Settings
+from ..config import Settings
 
 
 def create_openai_client(settings: Settings) -> OpenAI:

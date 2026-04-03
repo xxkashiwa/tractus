@@ -5,8 +5,8 @@ from pathlib import Path
 from flasgger import Swagger, swag_from
 from flask import Flask, jsonify, request
 
-from .config import get_settings
-from .llm import chat_text, create_openai_client
+from ..config import get_settings
+from ..model import chat_text, create_openai_client
 
 
 def create_app() -> Flask:

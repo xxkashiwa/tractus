@@ -22,5 +22,5 @@ build-backend = "hatchling.build"
 packages = ["src/tractus"]
 
 [tool.poe.tasks]
-serve = { cmd = "python -m tractus.cli serve $args", help = "Start Flask dev server (example: poe serve 8000 --debug)" }
-chat = { cmd = "python -m tractus.cli chat $args", help = "One-shot chat call (example: poe chat 你好)" }
+serve = { cmd = "python -X pycache_prefix=.pycache -m tractus.tools.cli serve $args", help = "Start Flask dev server (example: poe serve 8000 --debug)" }
+chat = { cmd = "python -X pycache_prefix=.pycache -m tractus.tools.cli chat $args", help = "One-shot chat call (example: poe chat 你好)" }
