@@ -9,6 +9,7 @@ from typing import Literal
 
 @dataclass(frozen=True)
 class WebSearchResult:
+    """网页搜索结果。"""
     title: str
     url: str
     snippet: str | None = None
@@ -28,27 +29,27 @@ def web_search(
     backend: Backend = "auto",
     timeout: float = 10.0,
 ) -> list[WebSearchResult]:
-    """Search the web via DuckDuckGo.
+    """通过 DuckDuckGo 搜索网络。
 
-    Prefers the `ddgs` library (richer results). If the library is unavailable
-    or `backend="instant-answer"` is chosen, falls back to
-    DuckDuckGo's Instant Answer API (more limited results).
+    优先使用 `ddgs` 库（结果更丰富）。如果库不可用
+    或选择 `backend="instant-answer"`，则回退到
+    DuckDuckGo 的 Instant Answer API（结果较少）。
 
-    Args:
-        query: Search query.
-        max_results: Maximum number of results to return (best-effort).
-        region: DuckDuckGo region code (e.g. "us-en", "cn-zh", "wt-wt").
-        safesearch: "on" | "moderate" | "off".
-        timelimit: Optional time filter supported by the library backend.
-        backend: "auto" | "library" | "instant-answer".
-        timeout: Network timeout in seconds.
+    参数：
+        query: 搜索查询。
+        max_results: 返回的最大结果数（尽力而为）。
+        region: DuckDuckGo 地区代码（例如 "us-en", "cn-zh", "wt-wt"）。
+        safesearch: "on" | "moderate" | "off"。
+        timelimit: 库后端支持的可选时间过滤。
+        backend: "auto" | "library" | "instant-answer"。
+        timeout: 网络超时时间（秒）。
 
-    Returns:
-        A list of WebSearchResult.
+    返回值：
+        WebSearchResult 列表。
 
-    Raises:
-        ValueError: On invalid arguments.
-        RuntimeError: If the selected backend fails.
+    异常：
+        ValueError: 无效的参数。
+        RuntimeError: 如果选定的后端失败。
     """
 
     query = (query or "").strip()
@@ -75,14 +76,14 @@ def web_search(
                 raise
         except Exception as exc:
             if backend == "library":
-                raise RuntimeError(f"DuckDuckGo library search failed: {exc}") from exc
+                raise RuntimeError(f"DuckDuckGo 库搜索失败：{exc}") from exc
 
     try:
         return _search_via_instant_answer(
             query, max_results=max_results, timeout=timeout
         )
     except Exception as exc:
-        raise RuntimeError(f"DuckDuckGo instant-answer search failed: {exc}") from exc
+        raise RuntimeError(f"DuckDuckGo 即时回答搜索失败：{exc}") from exc
 
 
 def _search_via_library(
@@ -124,19 +125,21 @@ def _search_via_library(
 
 
 def _import_ddgs_DDGS():
-    """Import DDGS class from supported DuckDuckGo search libraries.
+    """从支持的 DuckDuckGo 搜索库导入 DDGS 类。
 
-    Primary: `ddgs`.
-    Secondary: `duckduckgo_search` (kept only as a compatibility fallback).
+    主要：`ddgs`。
+    次要：`duckduckgo_search`（仅作为兼容性回退保留）。
     """
 
     try:
+        # 尝试使用主库 ddgs
         from ddgs import DDGS  # type: ignore
 
         return DDGS
     except ModuleNotFoundError:
         pass
 
+    # 回退到兼容性库
     from duckduckgo_search import DDGS  # type: ignore
 
     return DDGS
@@ -148,8 +151,8 @@ def _search_via_instant_answer(
     max_results: int,
     timeout: float,
 ) -> list[WebSearchResult]:
-    # NOTE: Instant Answer API is not a full web search API.
-    # It may return 0 results for many queries.
+    # 注意：Instant Answer API 不是完整的网络搜索 API。
+    # 对许多查询可能返回 0 个结果。
     params = {
         "q": query,
         "format": "json",
@@ -158,6 +161,7 @@ def _search_via_instant_answer(
     }
     url = "https://api.duckduckgo.com/?" + urllib.parse.urlencode(params)
 
+    # 发送搜索请求
     request = urllib.request.Request(
         url,
         headers={
@@ -184,7 +188,7 @@ def _search_via_instant_answer(
             )
         )
 
-    # 'Results' is often empty; 'RelatedTopics' may contain useful links.
+    # 'Results' 通常为空；'RelatedTopics' 可能包含有用的链接
     for item in _flatten_related_topics(data.get("Results") or []):
         if len(results) >= max_results:
             break
@@ -196,7 +200,7 @@ def _search_via_instant_answer(
                 break
             results.append(item)
 
-    # De-duplicate by URL (preserving order)
+    # 按 URL 去重（保留顺序）
     seen: set[str] = set()
     deduped: list[WebSearchResult] = []
     for r in results:
